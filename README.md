@@ -3,7 +3,7 @@ KeshFlow
 Aplicação web de gestão financeira pessoal para Moçambique (M-Pesa, m-Kesh, e-Mola, contas bancárias).
 
 Aceder à Aplicação
-URL de produção: https://keshflow.ac.mz
+URL de produção: https://keshflow.vercel.app
 
 Funcionalidades
 • Gerenciar carteiras digitais e contas bancárias
