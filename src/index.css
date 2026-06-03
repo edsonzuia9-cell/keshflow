@@ -1,0 +1,350 @@
+/* =====================================================
+   KeshFlow Design System v1.0
+   Clean Minimalista (Apple / Revolut Style)
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Brand Colors */
+  --kf-brand: #0f172a;
+  --kf-brand-light: #1e293b;
+  --kf-accent: #0066ff;
+  --kf-accent-hover: #0052cc;
+  --kf-accent-soft: rgba(0, 102, 255, 0.08);
+
+  /* Neutral Scale */
+  --kf-white: #ffffff;
+  --kf-gray-50: #f8fafc;
+  --kf-gray-100: #f1f5f9;
+  --kf-gray-200: #e2e8f0;
+  --kf-gray-300: #cbd5e1;
+  --kf-gray-400: #94a3b8;
+  --kf-gray-500: #64748b;
+  --kf-gray-600: #475569;
+  --kf-gray-700: #334155;
+  --kf-gray-800: #1e293b;
+  --kf-gray-900: #0f172a;
+
+  /* Semantic Colors */
+  --kf-success: #10b981;
+  --kf-success-bg: #d1fae5;
+  --kf-warning: #f59e0b;
+  --kf-warning-bg: #fef3c7;
+  --kf-danger: #ef4444;
+  --kf-danger-bg: #fee2e2;
+  --kf-danger-border: #fecaca;
+
+  /* Typography */
+  --kf-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --kf-font-mono: 'SF Mono', ui-monospace, Consolas, monospace;
+
+  /* Spacing Scale (8px base) */
+  --kf-space-1: 4px;
+  --kf-space-2: 8px;
+  --kf-space-3: 12px;
+  --kf-space-4: 16px;
+  --kf-space-5: 20px;
+  --kf-space-6: 24px;
+  --kf-space-8: 32px;
+  --kf-space-10: 40px;
+  --kf-space-12: 48px;
+  --kf-space-16: 64px;
+
+  /* Layout */
+  --kf-radius-sm: 6px;
+  --kf-radius-md: 10px;
+  --kf-radius-lg: 14px;
+  --kf-radius-xl: 20px;
+  --kf-radius-full: 9999px;
+
+  /* Shadows (soft, diffuse) */
+  --kf-shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --kf-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+  --kf-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.06), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  --kf-shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 10px 10px -5px rgba(15, 23, 42, 0.02);
+  --kf-shadow-card: 0 0 0 1px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04);
+
+  /* Transitions */
+  --kf-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--kf-font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--kf-gray-800);
+  background-color: var(--kf-gray-50);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  text-align: left;
+  border: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--kf-gray-900);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+
+p {
+  color: var(--kf-gray-600);
+  line-height: 1.6;
+}
+
+small {
+  font-size: 0.875rem;
+  color: var(--kf-gray-500);
+}
+
+/* Links */
+a {
+  color: var(--kf-accent);
+  text-decoration: none;
+  transition: var(--kf-transition);
+}
+
+a:hover {
+  color: var(--kf-accent-hover);
+}
+
+/* Form Elements */
+input, select, textarea {
+  font-family: var(--kf-font);
+  font-size: 15px;
+  color: var(--kf-gray-900);
+  background: var(--kf-white);
+  border: 1.5px solid var(--kf-gray-200);
+  border-radius: var(--kf-radius-md);
+  padding: 12px 16px;
+  width: 100%;
+  transition: var(--kf-transition);
+  outline: none;
+}
+
+input::placeholder, select::placeholder, textarea::placeholder {
+  color: var(--kf-gray-400);
+}
+
+input:hover, select:hover, textarea:hover {
+  border-color: var(--kf-gray-300);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--kf-accent);
+  box-shadow: 0 0 0 3px var(--kf-accent-soft);
+}
+
+input:disabled, select:disabled {
+  background: var(--kf-gray-100);
+  color: var(--kf-gray-400);
+  cursor: not-allowed;
+}
+
+/* Buttons */
+button {
+  font-family: var(--kf-font);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--kf-radius-md);
+  padding: 12px 24px;
+  transition: var(--kf-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--kf-brand);
+  color: var(--kf-white);
+  box-shadow: var(--kf-shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--kf-brand-light);
+  transform: translateY(-1px);
+  box-shadow: var(--kf-shadow-md);
+}
+
+.btn-accent {
+  background: var(--kf-accent);
+  color: var(--kf-white);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--kf-accent-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--kf-gray-700);
+  border: 1.5px solid var(--kf-gray-200);
+}
+
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--kf-gray-400);
+  background: var(--kf-gray-50);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--kf-gray-600);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--kf-gray-100);
+  color: var(--kf-gray-900);
+}
+
+.btn-danger {
+  background: var(--kf-danger);
+  color: var(--kf-white);
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--kf-danger);
+  border: 1.5px solid var(--kf-danger-border);
+}
+
+.btn-danger-ghost:hover:not(:disabled) {
+  background: var(--kf-danger-bg);
+}
+
+/* Cards */
+.card {
+  background: var(--kf-white);
+  border-radius: var(--kf-radius-lg);
+  box-shadow: var(--kf-shadow-card);
+  padding: var(--kf-space-6);
+  transition: var(--kf-transition);
+}
+
+.card-hover:hover {
+  box-shadow: var(--kf-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: var(--kf-gray-500); }
+.text-success { color: var(--kf-success); }
+.text-danger { color: var(--kf-danger); }
+.text-warning { color: var(--kf-warning); }
+
+.font-mono { font-family: var(--kf-font-mono); }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: var(--kf-space-1); }
+.gap-2 { gap: var(--kf-space-2); }
+.gap-3 { gap: var(--kf-space-3); }
+.gap-4 { gap: var(--kf-space-4); }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.mt-1 { margin-top: var(--kf-space-1); }
+.mt-2 { margin-top: var(--kf-space-2); }
+.mt-4 { margin-top: var(--kf-space-4); }
+.mt-6 { margin-top: var(--kf-space-6); }
+.mb-2 { margin-bottom: var(--kf-space-2); }
+.mb-4 { margin-bottom: var(--kf-space-4); }
+.mb-6 { margin-bottom: var(--kf-space-6); }
+
+.p-4 { padding: var(--kf-space-4); }
+.p-6 { padding: var(--kf-space-6); }
+
+.rounded-md { border-radius: var(--kf-radius-md); }
+.rounded-lg { border-radius: var(--kf-radius-lg); }
+.rounded-full { border-radius: var(--kf-radius-full); }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--kf-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--kf-gray-300);
+  border-radius: var(--kf-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--kf-gray-400);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  .card { padding: var(--kf-space-4); }
+}
