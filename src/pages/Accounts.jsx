@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { accountsService } from '../services/accountsService';
-import Navbar from '../components/Navbar';
 import TransferModal from '../components/TransferModal';
 import { 
   Smartphone, Landmark, Banknote, PiggyBank, Star, Archive, ArchiveRestore,
@@ -24,16 +23,32 @@ const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [archivedAccounts, setArchivedAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('active'); // 'active' | 'archived'
+  const [activeTab, setActiveTab] = useState('active');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Form states
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
   const [type, setType] = useState('mpesa');
   const [alertThreshold, setAlertThreshold] = useState('');
 
-  // Auto-detect type from phone
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
+  const [expandedId, setExpandedId] = useState(null);
+  const [accountHistory, setAccountHistory] = useState({});
+
+  const [showTransfer, setShowTransfer] = useState(false);
+  const [transferAccount, setTransferAccount] = useState(null);
+
+  const [showBalances, setShowBalances] = useState({});
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const prefix = phone.substring(0, 2);
     for (const [key, config] of Object.entries(ACCOUNT_TYPES)) {
@@ -43,25 +58,6 @@ const Accounts = () => {
       }
     }
   }, [phone]);
-
-  // Edit states
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({});
-
-  // Expand/history states
-  const [expandedId, setExpandedId] = useState(null);
-  const [accountHistory, setAccountHistory] = useState({});
-
-  // Transfer modal
-  const [showTransfer, setShowTransfer] = useState(false);
-  const [transferAccount, setTransferAccount] = useState(null);
-
-  // Show/hide balances
-  const [showBalances, setShowBalances] = useState({});
-
-  const toggleBalance = (id) => {
-    setShowBalances(prev => ({ ...prev, [id]: !prev[id] }));
-  };
 
   useEffect(() => {
     loadAccounts();
@@ -149,6 +145,10 @@ const Accounts = () => {
     setShowTransfer(true);
   };
 
+  const toggleBalance = (id) => {
+    setShowBalances(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const getTypeConfig = (t) => ACCOUNT_TYPES[t] || ACCOUNT_TYPES['mpesa'];
 
   const renderAccountCard = (acc, isArchived = false) => {
@@ -163,12 +163,12 @@ const Accounts = () => {
     return (
       <div key={acc.id} style={{...styles.card, opacity: isArchived ? 0.7 : 1}}>
         {/* Header */}
-        <div style={styles.cardHeader}>
+        <div style={isMobile ? styles.cardHeaderMobile : styles.cardHeader}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div style={{...styles.iconCircle, backgroundColor: config.bg, color: config.color}}>
               <Icon size={20} />
             </div>
-            <div>
+            <div style={{ minWidth: 0 }}>
               {editingId === acc.id ? (
                 <input 
                   value={editForm.name} 
@@ -177,7 +177,7 @@ const Accounts = () => {
                 />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '1rem' }}>{acc.name}</span>
+                  <span style={{ fontWeight: '700', color: '#0f172a', fontSize: '1rem', wordBreak: 'break-word' }}>{acc.name}</span>
                   {isDefault && <Star size={14} fill="#f59e0b" color="#f59e0b" />}
                 </div>
               )}
@@ -187,7 +187,7 @@ const Accounts = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '6px' }}>
+          <div style={isMobile ? styles.actionsMobile : styles.actions}>
             {!isArchived && (
               <>
                 <button onClick={() => openTransfer(acc)} style={styles.actionBtn} title="Transferir">
@@ -224,10 +224,10 @@ const Accounts = () => {
         )}
 
         {/* Saldo */}
-        <div style={styles.balanceRow}>
+        <div style={isMobile ? styles.balanceRowMobile : styles.balanceRow}>
           <div>
             <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '6px' }}>Saldo Atual</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: isLowBalance ? '#ef4444' : '#0f172a', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: isMobile ? '1.375rem' : '1.75rem', fontWeight: 800, color: isLowBalance ? '#ef4444' : '#0f172a', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
               {show ? `${Number(acc.balance).toLocaleString('pt-PT', { minimumFractionDigits: 2 })} MT` : '•••••• MT'}
             </div>
           </div>
@@ -270,7 +270,7 @@ const Accounts = () => {
 
         {/* Edit mode actions */}
         {editingId === acc.id && (
-          <div style={{ display: 'flex', gap: '12px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
+          <div style={isMobile ? styles.editRowMobile : styles.editRow}>
             <div style={{ flex: 1 }}>
               <label style={{...styles.label, fontSize: '0.75rem', marginBottom: '4px', display: 'block'}}>Tipo</label>
               <select 
@@ -309,12 +309,12 @@ const Accounts = () => {
         {/* Header */}
         <div style={styles.header}>
           <div>
-            <h1 style={styles.pageTitle}>Minhas Contas</h1>
+            <h1 style={isMobile ? styles.pageTitleMobile : styles.pageTitle}>Minhas Contas</h1>
             <p style={styles.pageSubtitle}>Gerencia todos os teus instrumentos financeiros num só lugar.</p>
           </div>
         </div>
 
-        <div style={styles.mainGrid}>
+        <div style={isMobile ? styles.mainGridMobile : styles.mainGrid}>
           {/* Formulário */}
           <section style={styles.formSection}>
             <h2 style={styles.formTitle}>
@@ -323,7 +323,7 @@ const Accounts = () => {
             <form onSubmit={handleCreate} style={styles.form}>
               <div style={styles.field}>
                 <label style={styles.label}>Tipo de Conta</label>
-                <div style={styles.typeGrid}>
+                <div style={isMobile ? styles.typeGridMobile : styles.typeGrid}>
                   {Object.entries(ACCOUNT_TYPES).map(([key, config]) => {
                     const TypeIcon = config.icon;
                     return (
@@ -361,7 +361,6 @@ const Accounts = () => {
                   value={phone} 
                   onChange={e => setPhone(e.target.value.replace(type === 'cash' || type === 'savings' ? /[^a-zA-Z0-9 ]/g : /[^0-9]/g, ''))} 
                   style={styles.input}
-                  disabled={type === 'cash' || type === 'savings' ? false : false}
                 />
                 {ACCOUNT_TYPES[type]?.label && phone.length >= 2 && type !== 'cash' && type !== 'savings' && (
                   <span style={styles.detectedBadge}>{ACCOUNT_TYPES[type].label}</span>
@@ -380,7 +379,7 @@ const Accounts = () => {
                 />
               </div>
 
-              <div style={styles.fieldRow}>
+              <div style={isMobile ? styles.fieldRowMobile : styles.fieldRow}>
                 <div style={styles.fieldHalf}>
                   <label style={styles.label}>Saldo Inicial (MT)</label>
                   <input 
@@ -413,7 +412,7 @@ const Accounts = () => {
 
           {/* Lista de Contas */}
           <section style={styles.listSection}>
-            <div style={styles.listHeader}>
+            <div style={isMobile ? styles.listHeaderMobile : styles.listHeader}>
               <h3 style={styles.subTitle}>Minhas Contas</h3>
               <div style={styles.tabSwitcher}>
                 <button 
@@ -447,7 +446,6 @@ const Accounts = () => {
         </div>
       </div>
 
-      {/* Transfer Modal */}
       <TransferModal 
         isOpen={showTransfer} 
         onClose={() => setShowTransfer(false)} 
@@ -461,16 +459,16 @@ const Accounts = () => {
 
 const styles = {
   page: {
-    minHeight: 'calc(100vh - 70px)',
+    minHeight: 'calc(100vh - 64px)',
     background: '#f8fafc',
-    padding: '32px 24px',
+    padding: '24px',
   },
   container: {
     maxWidth: '1200px',
     margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: '28px',
+    gap: '24px',
   },
   header: {
     display: 'flex',
@@ -486,6 +484,13 @@ const styles = {
     margin: '0 0 4px 0',
     letterSpacing: '-0.02em',
   },
+  pageTitleMobile: {
+    fontSize: '1.375rem',
+    fontWeight: 800,
+    color: '#0f172a',
+    margin: '0 0 4px 0',
+    letterSpacing: '-0.02em',
+  },
   pageSubtitle: {
     color: '#64748b',
     fontSize: '0.9375rem',
@@ -493,12 +498,17 @@ const styles = {
   },
   mainGrid: {
     display: 'grid',
-    gridTemplateColumns: '380px 1fr',
-    gap: '28px',
+    gridTemplateColumns: '360px 1fr',
+    gap: '24px',
+  },
+  mainGridMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '20px',
   },
   formSection: {
     background: '#fff',
-    padding: '28px',
+    padding: '24px',
     borderRadius: '16px',
     boxShadow: '0 0 0 1px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(15, 23, 42, 0.04)',
     height: 'fit-content',
@@ -507,7 +517,7 @@ const styles = {
     fontSize: '1.125rem',
     fontWeight: 700,
     color: '#0f172a',
-    margin: '0 0 24px 0',
+    margin: '0 0 20px 0',
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
@@ -515,22 +525,27 @@ const styles = {
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '16px',
   },
   field: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: '6px',
   },
   fieldRow: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: '12px',
   },
+  fieldRowMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '12px',
+  },
   fieldHalf: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: '6px',
   },
   label: {
     fontSize: '0.875rem',
@@ -565,14 +580,19 @@ const styles = {
   typeGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: '10px',
+    gap: '8px',
+  },
+  typeGridMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '6px',
   },
   typeBtn: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '8px',
-    padding: '16px 12px',
+    gap: '6px',
+    padding: '12px 8px',
     borderRadius: '12px',
     border: '2px solid',
     cursor: 'pointer',
@@ -605,13 +625,18 @@ const styles = {
   listSection: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '16px',
   },
   listHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
+    gap: '12px',
+  },
+  listHeaderMobile: {
+    display: 'flex',
+    flexDirection: 'column',
     gap: '12px',
   },
   subTitle: {
@@ -631,7 +656,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '8px 16px',
+    padding: '8px 14px',
     borderRadius: '10px',
     border: 'none',
     cursor: 'pointer',
@@ -648,11 +673,11 @@ const styles = {
   grid: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
+    gap: '12px',
   },
   card: {
     background: '#fff',
-    padding: '24px',
+    padding: '20px',
     borderRadius: '16px',
     boxShadow: '0 0 0 1px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04)',
     transition: 'all 0.2s ease',
@@ -663,6 +688,12 @@ const styles = {
     alignItems: 'flex-start',
     marginBottom: '16px',
   },
+  cardHeaderMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '16px',
+  },
   iconCircle: {
     width: '44px',
     height: '44px',
@@ -671,6 +702,17 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+  },
+  actions: {
+    display: 'flex',
+    gap: '6px',
+    flexWrap: 'wrap',
+  },
+  actionsMobile: {
+    display: 'flex',
+    gap: '6px',
+    flexWrap: 'wrap',
+    width: '100%',
   },
   actionBtn: {
     width: '36px',
@@ -702,6 +744,12 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
+  },
+  balanceRowMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    alignItems: 'flex-start',
   },
   expandBtn: {
     display: 'flex',
@@ -741,6 +789,21 @@ const styles = {
     width: '100%',
     fontFamily: 'Inter, system-ui, sans-serif',
     color: '#0f172a',
+  },
+  editRow: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '1px solid #e2e8f0',
+  },
+  editRowMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '1px solid #e2e8f0',
   },
   editActionBtn: {
     width: '36px',

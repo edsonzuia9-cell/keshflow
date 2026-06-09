@@ -5,7 +5,12 @@ const Layout = () => {
   return (
     <>
       <Navbar />
-      <main style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <main style={{ 
+        minHeight: 'calc(100vh - 64px)',
+        width: '100%',
+        maxWidth: '100%',
+        overflowX: 'hidden'
+      }}>
         <Outlet />
       </main>
     </>

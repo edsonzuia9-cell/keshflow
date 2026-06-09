@@ -6,7 +6,8 @@ import Accounts from './pages/Accounts';
 import Transactions from './pages/Transactions';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
-
+import ForgotPassword from './auth/ForgotPassword'; 
+import ResetPassword from './auth/ResetPassword';
 
 function App() {
   return (
@@ -29,6 +30,9 @@ function App() {
 
         {/* Redirecionamento de segurança */}
         <Route path="*" element={<Navigate to="/" replace />} />
+
+        <Route path="/forgot-password" element={<ForgotPassword />} /> 
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );

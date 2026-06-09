@@ -20,7 +20,6 @@ const months = [
 
 const years = [2025, 2026, 2027];
 
-// Memoizar componentes pesados
 const MemoizedChart = memo(Chart);
 const MemoizedBudgetProgress = memo(BudgetProgress);
 const MemoizedSavingsGoals = memo(SavingsGoals);
@@ -35,14 +34,19 @@ const Dashboard = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [totals, setTotals] = useState({ balance: 0, income: 0, expense: 0 });
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Edição inline
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ id: null, description: '', amount: 0 });
-
-  // Orçamento inline
   const [showBudgetSetup, setShowBudgetSetup] = useState(false);
   const [newBudget, setNewBudget] = useState({ category: 'Alimentação', limit_amount: '' });
+
+  // Detectar mobile
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -187,16 +191,16 @@ const Dashboard = () => {
     <div style={styles.page}>
       <div style={styles.container}>
         {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <h1 style={styles.pageTitle}>
+        <div style={isMobile ? styles.headerMobile : styles.header}>
+          <div style={{ flex: 1 }}>
+            <h1 style={isMobile ? styles.pageTitleMobile : styles.pageTitle}>
               {profile?.nome ? `Olá, ${profile.nome.split(' ')[0]} 👋` : 'Dashboard'}
             </h1>
             <p style={styles.pageSubtitle}>
               O resumo financeiro real para estudantes do ISPT.
             </p>
           </div>
-          <div style={styles.filters}>
+          <div style={isMobile ? styles.filtersMobile : styles.filters}>
             <div style={styles.selectWrapper}>
               <Calendar size={16} style={styles.selectIcon} />
               <select 
@@ -228,9 +232,10 @@ const Dashboard = () => {
             backgroundColor: budgetAlert.type === 'danger' ? '#fef2f2' : '#fffbeb',
             borderColor: budgetAlert.type === 'danger' ? '#fecaca' : '#fde68a',
             color: budgetAlert.type === 'danger' ? '#dc2626' : '#d97706',
+            fontSize: isMobile ? '0.8125rem' : '0.9375rem',
           }}>
-            <AlertCircle size={18} />
-            <span style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{budgetAlert.msg}</span>
+            <AlertCircle size={isMobile ? 16 : 18} />
+            <span style={{ fontWeight: 600 }}>{budgetAlert.msg}</span>
           </div>
         )}
 
@@ -243,7 +248,7 @@ const Dashboard = () => {
                 <X size={18} />
               </button>
             </div>
-            <div style={styles.editRow}>
+            <div style={isMobile ? styles.editRowMobile : styles.editRow}>
               <input 
                 style={styles.editInput} 
                 value={editData.description} 
@@ -269,15 +274,15 @@ const Dashboard = () => {
         )}
 
         {/* Stats Cards */}
-        <div style={styles.statsGrid}>
+        <div style={isMobile ? styles.statsGridMobile : styles.statsGrid}>
           <div style={{ ...styles.statCard, borderTop: '3px solid #0f172a' }}>
             <div style={styles.statHeader}>
               <span style={styles.statLabel}>Saldo Total</span>
               <div style={{ ...styles.statIcon, background: '#f1f5f9', color: '#0f172a' }}>
-                <Wallet size={18} />
+                <Wallet size={isMobile ? 16 : 18} />
               </div>
             </div>
-            <div style={styles.statValue}>
+            <div style={isMobile ? styles.statValueMobile : styles.statValue}>
               {totals.balance.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} <span style={styles.statCurrency}>MT</span>
             </div>
             <div style={styles.statTrend}>
@@ -288,12 +293,12 @@ const Dashboard = () => {
 
           <div style={{ ...styles.statCard, borderTop: '3px solid #10b981' }}>
             <div style={styles.statHeader}>
-              <span style={styles.statLabel}>Entradas do Mês</span>
+              <span style={styles.statLabel}>Entradas</span>
               <div style={{ ...styles.statIcon, background: '#d1fae5', color: '#059669' }}>
-                <TrendingUp size={18} />
+                <TrendingUp size={isMobile ? 16 : 18} />
               </div>
             </div>
-            <div style={{ ...styles.statValue, color: '#059669' }}>
+            <div style={{ ...styles.statValue, color: '#059669', fontSize: isMobile ? '1.25rem' : '1.875rem' }}>
               +{totals.income.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} <span style={styles.statCurrency}>MT</span>
             </div>
             <div style={styles.statTrend}>
@@ -305,12 +310,12 @@ const Dashboard = () => {
 
           <div style={{ ...styles.statCard, borderTop: '3px solid #ef4444' }}>
             <div style={styles.statHeader}>
-              <span style={styles.statLabel}>Saídas do Mês</span>
+              <span style={styles.statLabel}>Saídas</span>
               <div style={{ ...styles.statIcon, background: '#fee2e2', color: '#dc2626' }}>
-                <TrendingDown size={18} />
+                <TrendingDown size={isMobile ? 16 : 18} />
               </div>
             </div>
-            <div style={{ ...styles.statValue, color: '#dc2626' }}>
+            <div style={{ ...styles.statValue, color: '#dc2626', fontSize: isMobile ? '1.25rem' : '1.875rem' }}>
               -{totals.expense.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} <span style={styles.statCurrency}>MT</span>
             </div>
             <div style={styles.statTrend}>
@@ -322,7 +327,7 @@ const Dashboard = () => {
         </div>
 
         {/* Main Grid */}
-        <div style={styles.mainGrid}>
+        <div style={isMobile ? styles.mainGridMobile : styles.mainGrid}>
           <div style={styles.leftColumn}>
             {/* Budget */}
             <div style={styles.card}>
@@ -341,7 +346,7 @@ const Dashboard = () => {
 
               {showBudgetSetup && (
                 <div style={styles.budgetForm}>
-                  <div style={styles.budgetRow}>
+                  <div style={isMobile ? styles.budgetRowMobile : styles.budgetRow}>
                     <select 
                       value={newBudget.category} 
                       onChange={e => setNewBudget({...newBudget, category: e.target.value})} 
@@ -426,7 +431,7 @@ const Dashboard = () => {
 
 const styles = {
   page: {
-    minHeight: 'calc(100vh - 70px)',
+    minHeight: 'calc(100vh - 64px)',
     background: '#f8fafc',
     padding: '32px 24px',
   },
@@ -438,7 +443,7 @@ const styles = {
     gap: '28px',
   },
   loadingContainer: {
-    minHeight: 'calc(100vh - 70px)',
+    minHeight: 'calc(100vh - 64px)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -465,8 +470,20 @@ const styles = {
     flexWrap: 'wrap',
     gap: '16px',
   },
+  headerMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
   pageTitle: {
     fontSize: '1.75rem',
+    fontWeight: 800,
+    color: '#0f172a',
+    margin: '0 0 4px 0',
+    letterSpacing: '-0.02em',
+  },
+  pageTitleMobile: {
+    fontSize: '1.375rem',
     fontWeight: 800,
     color: '#0f172a',
     margin: '0 0 4px 0',
@@ -480,6 +497,11 @@ const styles = {
   filters: {
     display: 'flex',
     gap: '10px',
+  },
+  filtersMobile: {
+    display: 'flex',
+    gap: '10px',
+    width: '100%',
   },
   selectWrapper: {
     position: 'relative',
@@ -519,7 +541,7 @@ const styles = {
     padding: '14px 20px',
     borderRadius: '12px',
     border: '1px solid',
-    fontSize: '0.9375rem',
+    fontWeight: 600,
   },
   editCard: {
     background: '#fff',
@@ -560,6 +582,11 @@ const styles = {
     gap: '12px',
     flexWrap: 'wrap',
     alignItems: 'center',
+  },
+  editRowMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
   },
   editInput: {
     padding: '12px 16px',
@@ -606,6 +633,11 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '20px',
   },
+  statsGridMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '12px',
+  },
   statCard: {
     background: '#fff',
     borderRadius: '16px',
@@ -642,6 +674,13 @@ const styles = {
     letterSpacing: '-0.02em',
     marginBottom: '8px',
   },
+  statValueMobile: {
+    fontSize: '1.25rem',
+    fontWeight: 800,
+    color: '#0f172a',
+    letterSpacing: '-0.02em',
+    marginBottom: '8px',
+  },
   statCurrency: {
     fontSize: '1rem',
     fontWeight: 600,
@@ -654,6 +693,11 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: '1fr 420px',
     gap: '24px',
+  },
+  mainGridMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '16px',
   },
   leftColumn: {
     display: 'flex',
@@ -676,6 +720,8 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '12px',
   },
   cardTitle: {
     fontSize: '1rem',
@@ -720,6 +766,11 @@ const styles = {
   },
   budgetRow: {
     display: 'flex',
+    gap: '12px',
+  },
+  budgetRowMobile: {
+    display: 'flex',
+    flexDirection: 'column',
     gap: '12px',
   },
   budgetSelect: {

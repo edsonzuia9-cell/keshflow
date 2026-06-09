@@ -80,6 +80,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-size: 15px;
 }
 
 body {
@@ -89,6 +90,7 @@ body {
   color: var(--kf-gray-800);
   background-color: var(--kf-gray-50);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 #root {
@@ -148,6 +150,8 @@ input, select, textarea {
   width: 100%;
   transition: var(--kf-transition);
   outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 input::placeholder, select::placeholder, textarea::placeholder {
@@ -183,6 +187,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:disabled {
@@ -305,8 +310,8 @@ button:disabled {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -341,10 +346,74 @@ button:disabled {
   animation: slideIn 0.3s ease-out forwards;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  body { font-size: 14px; }
+/* ============================================
+   RESPONSIVE - Mobile First
+   ============================================ */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+  html { font-size: 14px; }
+  h1 { font-size: 1.625rem; }
+  h2 { font-size: 1.375rem; }
+  h3 { font-size: 1.125rem; }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  html { font-size: 14px; }
+
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
-  .card { padding: var(--kf-space-4); }
+  h3 { font-size: 1.0625rem; }
+  h4 { font-size: 1rem; }
+
+  input, select, textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 10px 14px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+
+  .card {
+    padding: var(--kf-space-4);
+    border-radius: var(--kf-radius-md);
+  }
+}
+
+/* Small Mobile (< 480px) */
+@media (max-width: 479px) {
+  html { font-size: 13px; }
+
+  h1 { font-size: 1.375rem; }
+  h2 { font-size: 1.125rem; }
+
+  input, select, textarea {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  button {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (pointer: coarse) {
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
 }

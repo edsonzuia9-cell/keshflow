@@ -16,8 +16,8 @@ export default function Transactions() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [filters, setFilters] = useState({});
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Form state
   const [formData, setFormData] = useState({
     type: 'expense',
     account_id: '',
@@ -27,7 +27,12 @@ export default function Transactions() {
     date: new Date().toISOString().split('T')[0],
   });
 
-  // Buscar user
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -36,13 +41,11 @@ export default function Transactions() {
     getUser();
   }, []);
 
-  // Buscar contas e transações
   const fetchData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     setError(null);
     try {
-      // Buscar contas
       const { data: accountsData, error: accountsError } = await supabase
         .from('accounts')
         .select('id, name, service_provider, balance, type, phone_number')
@@ -53,7 +56,6 @@ export default function Transactions() {
       if (accountsError) throw accountsError;
       setAccounts(accountsData || []);
 
-      // Buscar transações
       const { data: transData, error: transError } = await supabase
         .from('transactions')
         .select('id, created_at, type, amount, category, description, account_id')
@@ -74,13 +76,11 @@ export default function Transactions() {
     fetchData();
   }, [fetchData]);
 
-  // Categorias predefinidas
   const categories = [
     'Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Educação',
     'Lazer', 'Vestuário', 'Transferência', 'Casa', 'Salário', 'Outros'
   ];
 
-  // Filtros
   const filteredTransactions = useMemo(() => {
     let result = [...transactions];
 
@@ -127,7 +127,6 @@ export default function Transactions() {
     return result;
   }, [transactions, filters]);
 
-  // Resumo dinâmico baseado nos filtros
   const summary = useMemo(() => {
     const income = filteredTransactions
       .filter(t => t.type === 'income')
@@ -143,7 +142,6 @@ export default function Transactions() {
     };
   }, [filteredTransactions]);
 
-  // Criar transação
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -172,7 +170,6 @@ export default function Transactions() {
 
       if (insertError) throw insertError;
 
-      // Atualizar saldo da conta
       const account = accounts.find(a => a.id === formData.account_id);
       if (account) {
         const newBalance = formData.type === 'income'
@@ -203,14 +200,12 @@ export default function Transactions() {
     }
   };
 
-  // Eliminar transação
   const handleDelete = async (id) => {
     if (!confirm('Eliminar este movimento?')) return;
     try {
       const tx = transactions.find(t => t.id === id);
       if (!tx) return;
 
-      // Reverter saldo
       const account = accounts.find(a => a.id === tx.account_id);
       if (account) {
         const newBalance = tx.type === 'income'
@@ -230,7 +225,6 @@ export default function Transactions() {
     }
   };
 
-  // Helpers
   const getAccountName = (accountId) => {
     const acc = accounts.find(a => a.id === accountId);
     return acc ? `${acc.name} (${acc.service_provider})` : 'Conta desconhecida';
@@ -251,13 +245,13 @@ export default function Transactions() {
         {/* Header */}
         <div style={styles.header}>
           <div>
-            <h1 style={styles.title}>Transações</h1>
+            <h1 style={isMobile ? styles.titleMobile : styles.title}>Transações</h1>
             <p style={styles.subtitle}>Regista e consulta todos os teus movimentos</p>
           </div>
         </div>
 
         {/* Stats Bar */}
-        <div style={styles.statsGrid}>
+        <div style={isMobile ? styles.statsGridMobile : styles.statsGrid}>
           <div style={{ ...styles.statCard, borderTop: '3px solid #059669' }}>
             <div style={styles.statHeader}>
               <ArrowDownRight size={18} style={{ color: '#059669' }} />
@@ -312,7 +306,7 @@ export default function Transactions() {
           onFilterChange={setFilters}
         />
 
-        <div style={styles.grid}>
+        <div style={isMobile ? styles.gridMobile : styles.grid}>
           {/* Formulário */}
           <div style={styles.formCard}>
             <h2 style={styles.cardTitle}>
@@ -445,7 +439,7 @@ export default function Transactions() {
             ) : (
               <div style={styles.transactionList}>
                 {filteredTransactions.map((tx) => (
-                  <div key={tx.id} style={styles.transactionItem}>
+                  <div key={tx.id} style={isMobile ? styles.transactionItemMobile : styles.transactionItem}>
                     <div style={styles.txLeft}>
                       <div style={{
                         ...styles.txIcon,
@@ -518,6 +512,13 @@ const styles = {
     margin: 0,
     letterSpacing: '-0.02em',
   },
+  titleMobile: {
+    fontSize: '22px',
+    fontWeight: 700,
+    color: '#0f172a',
+    margin: 0,
+    letterSpacing: '-0.02em',
+  },
   subtitle: {
     fontSize: '14px',
     color: '#64748b',
@@ -527,6 +528,12 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
     gap: '16px',
+    marginBottom: '24px',
+  },
+  statsGridMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '12px',
     marginBottom: '24px',
   },
   statCard: {
@@ -592,6 +599,11 @@ const styles = {
     gridTemplateColumns: '380px 1fr',
     gap: '24px',
   },
+  gridMobile: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '20px',
+  },
   formCard: {
     background: '#ffffff',
     borderRadius: '16px',
@@ -650,6 +662,7 @@ const styles = {
     outline: 'none',
     fontFamily: 'Inter, system-ui, sans-serif',
     transition: 'border-color 0.2s, box-shadow 0.2s',
+    width: '100%',
   },
   typeToggle: {
     display: 'flex',
@@ -709,6 +722,15 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: '14px 16px',
+    borderRadius: '12px',
+    background: '#f8fafc',
+    transition: 'background 0.2s',
+  },
+  transactionItemMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
     padding: '14px 16px',
     borderRadius: '12px',
     background: '#f8fafc',
@@ -795,16 +817,3 @@ const styles = {
     margin: 0,
   },
 };
-
-// Responsive
-if (typeof window !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = `
-    @media (max-width: 900px) {
-      div[style*="gridTemplateColumns: 380px 1fr"] {
-        grid-template-columns: 1fr !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
