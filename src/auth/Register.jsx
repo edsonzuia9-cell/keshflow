@@ -126,6 +126,7 @@ const Register = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  autoComplete="email"
                   style={styles.input}
                 />
               </div>
@@ -141,6 +142,7 @@ const Register = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoComplete="new-password"
                   minLength={6}
                   style={styles.input}
                 />
@@ -157,6 +159,7 @@ const Register = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  autoComplete="new-password"
                   style={styles.input}
                 />
               </div>
